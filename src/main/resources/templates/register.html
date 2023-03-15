@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Register</title>
+  <link th:href="@{/css/login.css}" rel="stylesheet" />
+</head>
+<section>
+  <div class="form-box">
+    <div class="form-value">
+      <form action="/register" method="post">
+        <h2>Login</h2>
+        <div class="inputbox">
+          <ion-icon name="mail-outline"></ion-icon>
+          <input id="username" type="text" name="username" required>
+          <label for="username">Username</label>
+        </div>
+        <div class="inputbox">
+          <ion-icon name="lock-closed-outline"></ion-icon>
+          <input id="password" type="password" name="password" required>
+          <label for="password">Password</label>
+        </div>
+        <div class="forget">
+          User <input  type="radio" name="role" value="USER" checked> <br>
+          Admin <input  type="radio" name="role" value="ADMIN"> <br>
+          Client <input  type="radio" name="role" value="CLIENT">
+          <input type="hidden" name="_csrf"  th:value="${_csrf.token}">
+        </div>
+
+        <button>Register</button>
+      </form>
+    </div>
+  </div>
+</section>
+<script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+</body>
+</html>
