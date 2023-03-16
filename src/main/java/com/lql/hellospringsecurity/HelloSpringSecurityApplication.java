@@ -1,7 +1,7 @@
 package com.lql.hellospringsecurity;
 
 import com.lql.hellospringsecurity.auth.Authority;
-import com.lql.hellospringsecurity.auth.UserDetail;
+import com.lql.hellospringsecurity.auth.CustomUser;
 import com.lql.hellospringsecurity.auth.UserService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -9,8 +9,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import java.util.List;
 
 @SpringBootApplication
 public class HelloSpringSecurityApplication {
@@ -37,9 +35,9 @@ public class HelloSpringSecurityApplication {
             userService.saveRole(new Authority("ROLE_CLIENT"));
 
 
-            userService.saveUser(new UserDetail("a", passwordEncoder().encode("a")));
-            userService.saveUser(new UserDetail("b", passwordEncoder().encode("b")));
-            userService.saveUser(new UserDetail("c", passwordEncoder().encode("c")));
+            userService.saveUser(new CustomUser("a", passwordEncoder().encode("a")));
+            userService.saveUser(new CustomUser("b", passwordEncoder().encode("b")));
+            userService.saveUser(new CustomUser("c", passwordEncoder().encode("c")));
 
 
             userService.addRoleToUser("a", "ROLE_USER");

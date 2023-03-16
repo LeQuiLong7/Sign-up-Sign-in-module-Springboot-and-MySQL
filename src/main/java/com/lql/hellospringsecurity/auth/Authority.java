@@ -16,12 +16,11 @@ public class Authority implements GrantedAuthority {
 
 
     @ManyToMany(mappedBy = "authorities")
-    private Set<UserDetail> userDetails;
+    private Set<CustomUser> userDetails;
 
     public Authority(String authority) {
         this.authority = authority;
     }
-
 
     @Override
     public String getAuthority() {

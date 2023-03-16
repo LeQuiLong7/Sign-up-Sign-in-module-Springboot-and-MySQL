@@ -2,10 +2,8 @@ package com.lql.hellospringsecurity.controller;
 
 
 import com.lql.hellospringsecurity.annotation.MyAnnotation;
-import com.lql.hellospringsecurity.auth.Authority;
-import com.lql.hellospringsecurity.auth.UserDetail;
+import com.lql.hellospringsecurity.auth.CustomUser;
 import com.lql.hellospringsecurity.model.Person;
-import com.lql.hellospringsecurity.repository.AuthorityRepository;
 import com.lql.hellospringsecurity.repository.PersonRepository;
 import com.lql.hellospringsecurity.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +26,7 @@ public class HomeController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('READ')")
-    public List<UserDetail> list() {
+    public List<CustomUser> list() {
         logger.trace("A TRACE Message");
         logger.debug("A DEBUG Message");
         logger.info("An INFO Message");

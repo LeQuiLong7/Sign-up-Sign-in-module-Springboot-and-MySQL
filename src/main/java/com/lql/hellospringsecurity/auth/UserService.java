@@ -1,12 +1,11 @@
 package com.lql.hellospringsecurity.auth;
 
+import com.lql.hellospringsecurity.exception.model.MyUsernameNotFoundException;
 import com.lql.hellospringsecurity.exception.model.RoleNotFoundException;
 import com.lql.hellospringsecurity.repository.AuthorityRepository;
 import com.lql.hellospringsecurity.repository.UserRepository;
-import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -28,16 +27,17 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository
-                .findById(username)
-                .orElseThrow(() ->  new UsernameNotFoundException("not found username " + username));
+        return userRepository.findByUsername(username).map(CustomUserDetail::new)
+                .orElseThrow(MyUsernameNotFoundException::new);
     }
 
-    public UserDetail createUser(String username, String password, String role) {
-        UserDetail userDetail = new UserDetail(username, passwordEncoder.encode(password));
 
-        userDetail.setAuthorities(getAuthority(role));
-        return userDetail;
+
+    public CustomUser createUser(String username, String password, String role) {
+        CustomUser user = new CustomUser(username, passwordEncoder.encode(password));
+
+        user.setAuthorities(getAuthority(role));
+        return user;
     }
 
     private Set<Authority> getAuthority(String role) {
@@ -66,7 +66,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public UserDetail saveUser(UserDetail user) {
+    public CustomUser saveUser(CustomUser user) {
         return userRepository.save(user);
     }
 
@@ -75,9 +75,9 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public void addRoleToUser(String username, String roleName) {
-        UserDetail userDetail = userRepository.findById(username).orElseThrow(() -> new UsernameNotFoundException(":("));
+        CustomUser user = userRepository.findByUsername(username).orElseThrow(MyUsernameNotFoundException::new);
         Authority authority = authorityRepository.findAuthorityByAuthority(roleName).orElseThrow(RoleNotFoundException::new);
-        userDetail.addAuthority(authority);
+        user.addAuthority(authority);
 
     }
 }
