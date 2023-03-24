@@ -7,8 +7,6 @@ import com.lql.hellospringsecurity.model.Person;
 import com.lql.hellospringsecurity.repository.PersonRepository;
 import com.lql.hellospringsecurity.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,18 +18,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HomeController {
 
-    private final Logger logger = LoggerFactory.getLogger(HomeController.class);
     private final PersonRepository repositories;
     private final UserRepository repository;
 
     @GetMapping
     @PreAuthorize("hasAuthority('READ')")
     public List<CustomUser> list() {
-        logger.trace("A TRACE Message");
-        logger.debug("A DEBUG Message");
-        logger.info("An INFO Message");
-        logger.warn("A WARN Message");
-        logger.error("An ERROR Message");
         return repository.findAll();
     }
 
