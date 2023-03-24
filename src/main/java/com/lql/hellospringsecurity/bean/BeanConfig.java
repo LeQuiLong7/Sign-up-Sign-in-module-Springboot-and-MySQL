@@ -21,24 +21,6 @@ public class BeanConfig {
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
 
-
-//    Key secretKey() {
-//        String SECRET_KEY = "7234753778214125432A462D4A614E645267556B58703273357638792F423F45";
-//        byte[] bytes = Decoders.BASE64.decode(SECRET_KEY);
-//        return Keys.hmacShaKeyFor(bytes);
-//    }
-//
-//    @Bean
-//    public JwtParser jwtParser(){
-//        return Jwts.parserBuilder().setSigningKey(secretKey())
-//                .build();
-//    }
-//
-//    @Bean
-//    public JwtBuilder jwtBuilder() {
-//        return Jwts.builder().signWith(secretKey(), SignatureAlgorithm.HS256);
-//    }
-
     @Bean
     public AuthenticationProvider authenticationProvider() {
 
@@ -70,6 +52,7 @@ public class BeanConfig {
             userService.saveUser(new CustomUser("a", passwordEncoder.encode("a")));
             userService.saveUser(new CustomUser("b", passwordEncoder.encode("b")));
             userService.saveUser(new CustomUser("c", passwordEncoder.encode("c")));
+            userService.saveUser(new CustomUser("super", passwordEncoder.encode("s")));
 
 
             userService.addRoleToUser("a", "ROLE_USER");
@@ -78,6 +61,14 @@ public class BeanConfig {
             userService.addRoleToUser("b", "READ");
             userService.addRoleToUser("b", "WRITE");
             userService.addRoleToUser("c", "ROLE_ADMIN");
+            userService.addRoleToUser("super", "ROLE_ADMIN");
+            userService.addRoleToUser("super", "ROLE_USER");
+            userService.addRoleToUser("super", "ROLE_CLIENT");
+            userService.addRoleToUser("super", "UPDATE");
+            userService.addRoleToUser("super", "READ");
+            userService.addRoleToUser("super", "WRITE");
+            userService.addRoleToUser("super", "DELETE");
+            
         };
     }
 }

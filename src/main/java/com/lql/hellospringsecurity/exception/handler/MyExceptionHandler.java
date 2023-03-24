@@ -15,6 +15,12 @@ public class MyExceptionHandler {
         model.addAttribute("message", exception.getMessage());
         return ResponseEntity.badRequest().body("exception");
     }
+//
+//    @ExceptionHandler(Exception.class)
+//    public ResponseEntity<String> exception() {
+//
+//        return ResponseEntity.badRequest().body("exception");
+//    }
 
 
 }

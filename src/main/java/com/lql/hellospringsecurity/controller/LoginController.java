@@ -3,23 +3,14 @@ package com.lql.hellospringsecurity.controller;
 import com.lql.hellospringsecurity.auth.CustomUser;
 import com.lql.hellospringsecurity.service.JwtService;
 import com.lql.hellospringsecurity.service.UserService;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import java.util.ArrayList;
 
 @Controller
 @RequiredArgsConstructor
@@ -31,22 +22,27 @@ public class LoginController {
 
     @GetMapping("/login")
     public String getLogin() {
-        System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
+//        System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
 
         return "login";
     }
 
     @GetMapping("/home")
-//    @ResponseBody
     public String home() {
-        System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
+//        System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
         return "homepage";
     }
 
+    @PostMapping("/sign-up")
+    @ResponseBody
+    public CustomUser customUser(@RequestBody CustomUser user) {
+
+        return userService.saveUser(user);
+    }
 
     @GetMapping("/getToken")
     @ResponseBody
-    public String getHome(HttpServletResponse response) {
+    public String getToken() {
 
 
 
@@ -68,21 +64,7 @@ public class LoginController {
         return token;
 
     }
-    @GetMapping("/demo")
-    @ResponseBody
-    public String demo(HttpServletRequest request){
 
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password, new ArrayList<>());
-//        token.setAuthenticated(true);
-//        SecurityContextHolder.getContext().setAuthentication(token);
-        SecurityContext emptyContext = SecurityContextHolder.createEmptyContext();
-        emptyContext.setAuthentication(token);
-        SecurityContextHolder.setContext(emptyContext);
-
-        return "Hello";
-    }
 
     @PostMapping("/register")
     public String register(String username, String password, String role) {

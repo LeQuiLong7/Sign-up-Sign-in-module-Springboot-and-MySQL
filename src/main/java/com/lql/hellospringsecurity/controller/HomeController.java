@@ -3,14 +3,15 @@ package com.lql.hellospringsecurity.controller;
 
 import com.lql.hellospringsecurity.annotation.MyAnnotation;
 import com.lql.hellospringsecurity.auth.CustomUser;
-import com.lql.hellospringsecurity.model.Person;
-import com.lql.hellospringsecurity.repository.PersonRepository;
 import com.lql.hellospringsecurity.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @MyAnnotation("Hello World")
 @RestController
@@ -18,7 +19,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class HomeController {
 
-    private final PersonRepository repositories;
     private final UserRepository repository;
 
     @GetMapping
@@ -28,32 +28,34 @@ public class HomeController {
     }
 
     @PostMapping
+    @Transactional
     @PreAuthorize("hasAuthority('WRITE')")
-    public Person add(@RequestBody Person person) {
+    public CustomUser add(@RequestBody CustomUser user) {
 
         System.out.println("Posted successfully!");
-        return repositories.add(person);
+        return repository.save(user);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{username}")
     @PreAuthorize("hasAuthority('READ')")
-    public Person getPersonById(@PathVariable("id") int id) {
-        return repositories.get(id);
+    public ResponseEntity<?> getCustomUserById(@PathVariable("username") String username) {
+        Optional<CustomUser> user = repository.findByUsername(username);
+
+        if (user.isPresent())
+            return ResponseEntity.ok(user);
+
+        return ResponseEntity.notFound().build();
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{username}")
     @PreAuthorize("hasRole('ADMIN')")
-    public List<Person> deleteById(@PathVariable int id) {
-        if (repositories.deleteById(id))
-            System.out.println("Delete successfully");
-        return repositories.getAll();
+    @Transactional
+    public List<CustomUser> deleteById(@PathVariable String username) {
+        Optional<CustomUser> user = repository.findByUsername(username);
+        user.ifPresent(repository::delete);
+        return repository.findAll();
     }
 
-    @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public Person replace(@PathVariable int id, @RequestBody Person newPerson) {
-        return repositories.replace(id, newPerson);
-    }
 
 
 }

@@ -2,11 +2,8 @@ package com.lql.hellospringsecurity.filter;
 
 import com.lql.hellospringsecurity.service.JwtService;
 import com.lql.hellospringsecurity.service.UserService;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +16,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.security.Key;
-import java.util.Arrays;
-import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
