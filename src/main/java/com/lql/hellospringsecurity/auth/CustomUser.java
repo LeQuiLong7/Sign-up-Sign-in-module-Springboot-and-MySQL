@@ -1,6 +1,7 @@
 package com.lql.hellospringsecurity.auth;
 
 
+import com.lql.hellospringsecurity.model.UserDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -59,5 +60,9 @@ public class CustomUser implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public static UserDTO mapToUserDTO(CustomUser user) {
+        return new UserDTO(user.getId(), user.getUsername());
     }
 }

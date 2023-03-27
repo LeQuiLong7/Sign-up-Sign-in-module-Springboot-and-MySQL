@@ -4,6 +4,7 @@ package com.lql.hellospringsecurity.controller;
 import com.lql.hellospringsecurity.annotation.MyAnnotation;
 import com.lql.hellospringsecurity.auth.CustomUser;
 import com.lql.hellospringsecurity.model.PageRequestDetail;
+import com.lql.hellospringsecurity.model.UserDTO;
 import com.lql.hellospringsecurity.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -28,22 +29,20 @@ public class HomeController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('READ')")
-    public List<CustomUser> get(@RequestBody PageRequestDetail pageRequestDetail) {
+    public List<UserDTO> get(@RequestBody PageRequestDetail pageRequestDetail) {
         Pageable pageable = PageRequest.of(pageRequestDetail.getPageNo(),
                 pageRequestDetail.getPageSize() == 0 ? DEFAULT_PAGE_SIZE : pageRequestDetail.getPageSize());
         Page<CustomUser> users = repository.findAll(pageable);
 
-        return users.getContent();
+        return users.getContent().stream().map(CustomUser::mapToUserDTO).toList();
 
     }
 
     @PostMapping
     @Transactional
     @PreAuthorize("hasAuthority('WRITE')")
-    public CustomUser add(@RequestBody CustomUser user) {
-
-        System.out.println("Posted successfully!");
-        return repository.save(user);
+    public UserDTO add(@RequestBody CustomUser user) {
+        return CustomUser.mapToUserDTO(repository.save(user));
     }
 
     @GetMapping("/{username}")
@@ -52,7 +51,7 @@ public class HomeController {
         Optional<CustomUser> user = repository.findByUsername(username);
 
         if (user.isPresent())
-            return ResponseEntity.ok(user);
+            return ResponseEntity.ok(CustomUser.mapToUserDTO(user.get()));
 
         return ResponseEntity.notFound().build();
     }
@@ -60,16 +59,15 @@ public class HomeController {
     @DeleteMapping("/{username}")
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
-    public List<CustomUser> deleteById(@PathVariable String username, @RequestBody PageRequestDetail pageRequestDetail) {
+    public List<UserDTO> deleteById(@PathVariable String username, @RequestBody PageRequestDetail pageRequestDetail) {
         Optional<CustomUser> user = repository.findByUsername(username);
         user.ifPresent(repository::delete);
         Pageable pageable = PageRequest.of(pageRequestDetail.getPageNo(),
                 pageRequestDetail.getPageSize() == 0 ? DEFAULT_PAGE_SIZE : pageRequestDetail.getPageSize());
         Page<CustomUser> users = repository.findAll(pageable);
 
-        return users.getContent();
+        return users.getContent().stream().map(CustomUser::mapToUserDTO).toList();
     }
-
 
 
 }
