@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -30,13 +31,21 @@ public class HomeController {
     @GetMapping
     @PreAuthorize("hasAuthority('READ')")
     public List<UserDTO> get(@RequestBody PageRequestDetail pageRequestDetail) {
-        Pageable pageable = PageRequest.of(pageRequestDetail.getPageNo(),
-                pageRequestDetail.getPageSize() == 0 ? DEFAULT_PAGE_SIZE : pageRequestDetail.getPageSize());
+        Pageable pageable = getPageable(pageRequestDetail, Sort.unsorted());
         Page<CustomUser> users = repository.findAll(pageable);
 
         return users.getContent().stream().map(CustomUser::mapToUserDTO).toList();
 
     }
+
+
+    @GetMapping("/sort-by/{property}")
+    @PreAuthorize("hasAuthority('READ')")
+    public List<UserDTO> getAllUserSortedBy(@PathVariable String property, @RequestBody PageRequestDetail pageRequestDetail){
+        Pageable pageable = getPageable(pageRequestDetail, Sort.by(property));
+        return repository.findAll(pageable).getContent().stream().map(CustomUser::mapToUserDTO).toList();
+    }
+
 
     @PostMapping
     @Transactional
@@ -62,11 +71,14 @@ public class HomeController {
     public List<UserDTO> deleteById(@PathVariable String username, @RequestBody PageRequestDetail pageRequestDetail) {
         Optional<CustomUser> user = repository.findByUsername(username);
         user.ifPresent(repository::delete);
-        Pageable pageable = PageRequest.of(pageRequestDetail.getPageNo(),
-                pageRequestDetail.getPageSize() == 0 ? DEFAULT_PAGE_SIZE : pageRequestDetail.getPageSize());
-        Page<CustomUser> users = repository.findAll(pageable);
+        Pageable pageable = getPageable(pageRequestDetail, Sort.unsorted());
 
-        return users.getContent().stream().map(CustomUser::mapToUserDTO).toList();
+        return repository.findAll(pageable).getContent().stream().map(CustomUser::mapToUserDTO).toList();
+    }
+
+    private Pageable getPageable(PageRequestDetail pageRequestDetail, Sort sort) {
+        return PageRequest.of(pageRequestDetail.getPageNo(),
+                pageRequestDetail.getPageSize() == 0 ? DEFAULT_PAGE_SIZE : pageRequestDetail.getPageSize());
     }
 
 
