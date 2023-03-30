@@ -1,11 +1,13 @@
 package com.lql.hellospringsecurity.auth;
 
 
+import com.lql.hellospringsecurity.model.AvatarImage;
 import com.lql.hellospringsecurity.model.UserDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Cascade;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Set;
@@ -32,6 +34,10 @@ public class CustomUser implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "auth_id")
     )
     private Set<Authority> authorities;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private AvatarImage avatar;
 
     public CustomUser(String username, String password) {
         this.username = username;
