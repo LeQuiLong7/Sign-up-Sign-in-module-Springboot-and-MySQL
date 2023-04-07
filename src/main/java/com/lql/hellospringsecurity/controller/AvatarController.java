@@ -8,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -36,8 +34,8 @@ public class AvatarController {
 
     @GetMapping("/get-avt")
     public ResponseEntity<?> getAvatar() {
-        CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
+        CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         byte[] image = avatarService.downloadImageByUserId(user.getId());
 
         return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(image);

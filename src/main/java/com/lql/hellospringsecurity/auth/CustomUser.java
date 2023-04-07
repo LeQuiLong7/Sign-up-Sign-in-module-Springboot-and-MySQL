@@ -2,6 +2,7 @@ package com.lql.hellospringsecurity.auth;
 
 
 import com.lql.hellospringsecurity.model.AvatarImage;
+import com.lql.hellospringsecurity.model.Token;
 import com.lql.hellospringsecurity.model.UserDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -38,6 +39,11 @@ public class CustomUser implements UserDetails {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
     private AvatarImage avatar;
+
+
+//    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL)
+//    @PrimaryKeyJoinColumn
+//    private Token token;
 
     public CustomUser(String username, String password) {
         this.username = username;

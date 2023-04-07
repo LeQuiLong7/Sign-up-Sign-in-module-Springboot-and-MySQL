@@ -79,7 +79,6 @@ public class UserService implements UserDetailsService {
         CustomUser user = userRepository.findByUsername(username).orElseThrow(MyUsernameNotFoundException::new);
         Authority authority = authorityRepository.findAuthorityByAuthority(roleName).orElseThrow(RoleNotFoundException::new);
         user.addAuthority(authority);
-
     }
 
 

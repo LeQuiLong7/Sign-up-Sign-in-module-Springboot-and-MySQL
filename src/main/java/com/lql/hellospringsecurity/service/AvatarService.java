@@ -18,10 +18,9 @@ public class AvatarService {
 
     private final AvatarRepository repository;
 
-
     public String uploadFile(MultipartFile file, CustomUser user) throws IOException {
 
-        AvatarImage image = new AvatarImage(ImageUtils.compressImage(file.getBytes()), user);
+        AvatarImage image = new AvatarImage(file.getBytes(), user);
         repository.save(image);
 
         return "File saved successfully " + file.getOriginalFilename();
@@ -30,7 +29,7 @@ public class AvatarService {
 
         Optional<AvatarImage> avatarImage = repository.findById(userId);
         if(avatarImage.isPresent())
-            return ImageUtils.decompressImage(avatarImage.get().getImage());
+            return avatarImage.get().getImage();
 
         throw new MyUsernameNotFoundException();
     }

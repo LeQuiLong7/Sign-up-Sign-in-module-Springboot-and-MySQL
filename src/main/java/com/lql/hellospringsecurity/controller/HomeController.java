@@ -3,7 +3,7 @@ package com.lql.hellospringsecurity.controller;
 
 import com.lql.hellospringsecurity.annotation.MyAnnotation;
 import com.lql.hellospringsecurity.auth.CustomUser;
-import com.lql.hellospringsecurity.model.PageRequestDetail;
+import com.lql.hellospringsecurity.model.request.PageRequestDetail;
 import com.lql.hellospringsecurity.model.UserDTO;
 import com.lql.hellospringsecurity.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -54,6 +54,8 @@ public class HomeController {
         return CustomUser.mapToUserDTO(repository.save(user));
     }
 
+
+
     @GetMapping("/{username}")
     @PreAuthorize("hasAuthority('READ')")
     public ResponseEntity<?> getCustomUserById(@PathVariable("username") String username) {
@@ -78,7 +80,8 @@ public class HomeController {
 
     private Pageable getPageable(PageRequestDetail pageRequestDetail, Sort sort) {
         return PageRequest.of(pageRequestDetail.getPageNo(),
-                pageRequestDetail.getPageSize() == 0 ? DEFAULT_PAGE_SIZE : pageRequestDetail.getPageSize());
+                            pageRequestDetail.getPageSize() == 0 ? DEFAULT_PAGE_SIZE : pageRequestDetail.getPageSize(),
+                            sort);
     }
 
 

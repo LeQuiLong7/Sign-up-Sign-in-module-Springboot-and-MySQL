@@ -1,8 +1,12 @@
 package com.lql.hellospringsecurity.controller;
 
 import com.lql.hellospringsecurity.auth.CustomUser;
+import com.lql.hellospringsecurity.model.Token;
+import com.lql.hellospringsecurity.repository.TokenRepository;
+import com.lql.hellospringsecurity.repository.UserRepository;
 import com.lql.hellospringsecurity.service.JwtService;
 import com.lql.hellospringsecurity.service.UserService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,15 +16,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.Optional;
+
 @Controller
 @RequiredArgsConstructor
 public class LoginController {
 
-    private final UserService userService;
-    private final AuthenticationManager authenticationManager;
+    private final TokenRepository tokenRepository;
+    private final UserRepository userRepository;
     private final JwtService jwtService;
 
-    @GetMapping("/login")
+    @GetMapping("/sign-in")
     public String getLogin() {
 //        System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
 
@@ -33,48 +39,59 @@ public class LoginController {
         return "homepage";
     }
 
-    @PostMapping("/sign-up")
-    @ResponseBody
-    public CustomUser customUser(@RequestBody CustomUser user) {
 
-        return userService.saveUser(user);
-    }
 
     @GetMapping("/getToken")
     @ResponseBody
     public String getToken() {
 
+//        CustomUser user = getUser();
+        CustomUser user = getAuthenticatedUser();
+
+        String jwtToken = jwtService.generateToken(user);
+        Optional<Token> optionalToken = tokenRepository.findById(user.getId());
+        if (optionalToken.isEmpty() ) {
+            Token token = new Token(user.getId(), true);
+            tokenRepository.save(token);
+        } else {
+            Token tokenObject = optionalToken.get();
+            if (!tokenObject.isValid()) {
+                tokenObject.setValid(true);
+                tokenRepository.save(tokenObject);
+            }
+        }
+        return jwtToken;
+
+    }
 
 
+    @GetMapping("jwt-logout")
+    @Transactional
+    @ResponseBody
+    public String jwtLogout() {
 
-//        Authentication authenticate = authenticationManager.authenticate(
-//                new UsernamePasswordAuthenticationToken(request.getP, password));
+        CustomUser user = getAuthenticatedUser();
+        Token token = tokenRepository.getReferenceById(user.getId());
+        token.setValid(false);
+
+        return "jwt-logged-out";
+    }
+
+    private CustomUser getAuthenticatedUser() {
+        return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
+//    @PostMapping("/register")
+//    public String register(@RequestBody RegisterRequest registerRequest) {
+//        userService.saveUser(userService.createUser(username, password, role));
+//        return "redirect:/login";
+//    }
 //
-//        CustomUser user = (CustomUser) authenticate.getPrincipal();
 
-//        System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
-        CustomUser user = (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String token = jwtService.generateToken(user);
-//        System.out.println(jwtService.extractUsername(token));
-//        response.addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + token);
-//        Cookie cookie = new Cookie("token", token);
-//        cookie.setMaxAge(10 * 60);
-//        response.addCookie(cookie);
-
-        return token;
-
-    }
-
-
-    @PostMapping("/register")
-    public String register(String username, String password, String role) {
-        userService.saveUser(userService.createUser(username, password, role));
-        return "redirect:/login";
-    }
-    @GetMapping("/register")
-    public String getRegister() {
-        return "register";
-    }
+//    @GetMapping("/register")
+//    public String getRegister() {
+//        return "register";
+//    }
 
 
 }

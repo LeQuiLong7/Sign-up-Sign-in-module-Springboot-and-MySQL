@@ -1,4 +1,4 @@
-package com.lql.hellospringsecurity.model;
+package com.lql.hellospringsecurity.model.request;
 
 import lombok.Data;
 

@@ -1,5 +1,7 @@
 package com.lql.hellospringsecurity.filter;
 
+import com.lql.hellospringsecurity.auth.CustomUser;
+import com.lql.hellospringsecurity.repository.UserRepository;
 import com.lql.hellospringsecurity.service.JwtService;
 import com.lql.hellospringsecurity.service.UserService;
 import jakarta.servlet.FilterChain;
@@ -12,7 +14,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -24,6 +25,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserService userService;
+    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -88,10 +90,10 @@ public class JwtFilter extends OncePerRequestFilter {
 
         final String token = header.substring(7);
 
-        UserDetails user = userService.loadUserByUsername(jwtService.extractUsername(token));
+        UserDetails user = userService.loadUserByUsername(jwtService.extractUserName(token));
+//        CustomUser user = userRepository.getReferenceById(jwtService.extractUserId(token));
 
-
-        if(!jwtService.isTokenValid(token, user)) {
+        if(!jwtService.isTokenValid(token)) {
             filterChain.doFilter(request, response);
             return;
         }
