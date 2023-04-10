@@ -5,15 +5,11 @@ import com.lql.hellospringsecurity.model.Token;
 import com.lql.hellospringsecurity.repository.TokenRepository;
 import com.lql.hellospringsecurity.repository.UserRepository;
 import com.lql.hellospringsecurity.service.JwtService;
-import com.lql.hellospringsecurity.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Optional;
@@ -23,29 +19,13 @@ import java.util.Optional;
 public class LoginController {
 
     private final TokenRepository tokenRepository;
-    private final UserRepository userRepository;
     private final JwtService jwtService;
-
-    @GetMapping("/sign-in")
-    public String getLogin() {
-//        System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
-
-        return "login";
-    }
-
-    @GetMapping("/home")
-    public String home() {
-//        System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
-        return "homepage";
-    }
-
 
 
     @GetMapping("/getToken")
     @ResponseBody
     public String getToken() {
 
-//        CustomUser user = getUser();
         CustomUser user = getAuthenticatedUser();
 
         String jwtToken = jwtService.generateToken(user);
@@ -81,17 +61,6 @@ public class LoginController {
         return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
 
-//    @PostMapping("/register")
-//    public String register(@RequestBody RegisterRequest registerRequest) {
-//        userService.saveUser(userService.createUser(username, password, role));
-//        return "redirect:/login";
-//    }
-//
-
-//    @GetMapping("/register")
-//    public String getRegister() {
-//        return "register";
-//    }
 
 
 }

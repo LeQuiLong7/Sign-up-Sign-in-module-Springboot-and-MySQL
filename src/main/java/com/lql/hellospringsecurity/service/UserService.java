@@ -66,20 +66,4 @@ public class UserService implements UserDetailsService {
         };
     }
 
-    @Transactional
-    public CustomUser saveUser(CustomUser user) {
-        return userRepository.save(user);
-    }
-
-    @Transactional
-    public Authority saveRole(Authority authority) { return authorityRepository.save(authority); }
-
-    @Transactional
-    public void addRoleToUser(String username, String roleName) {
-        CustomUser user = userRepository.findByUsername(username).orElseThrow(MyUsernameNotFoundException::new);
-        Authority authority = authorityRepository.findAuthorityByAuthority(roleName).orElseThrow(RoleNotFoundException::new);
-        user.addAuthority(authority);
-    }
-
-
 }

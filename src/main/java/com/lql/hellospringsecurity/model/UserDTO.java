@@ -1,5 +1,9 @@
 package com.lql.hellospringsecurity.model;
 
 
-public record UserDTO (long id, String username) {
+import com.lql.hellospringsecurity.auth.Authority;
+
+import java.util.Set;
+
+public record UserDTO (long id, String username, Set<Authority> authorities ) {
 }

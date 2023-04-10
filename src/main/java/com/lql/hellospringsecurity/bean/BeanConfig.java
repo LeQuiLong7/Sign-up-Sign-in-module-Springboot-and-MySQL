@@ -2,7 +2,9 @@ package com.lql.hellospringsecurity.bean;
 
 import com.lql.hellospringsecurity.auth.Authority;
 import com.lql.hellospringsecurity.auth.CustomUser;
-import com.lql.hellospringsecurity.service.UserService;
+import com.lql.hellospringsecurity.repository.AuthorityRepository;
+import com.lql.hellospringsecurity.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -20,6 +22,8 @@ public class BeanConfig {
 
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
+    private final AuthorityRepository authorityRepository;
+    private final UserRepository userRepository;
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
@@ -36,39 +40,41 @@ public class BeanConfig {
         return configuration.getAuthenticationManager();
     }
 
-    @Bean
-    public CommandLineRunner runner(UserService userService, PasswordEncoder passwordEncoder) {
+//    @Bean
+//    @Transactional
+    public CommandLineRunner runner(PasswordEncoder passwordEncoder) {
         return args -> {
+            authorityRepository.save(new Authority("READ"));
+            authorityRepository.save(new Authority("WRITE"));
+            authorityRepository.save(new Authority("UPDATE"));
+            authorityRepository.save(new Authority("DELETE"));
+            authorityRepository.save(new Authority("ROLE_ADMIN"));
+            authorityRepository.save(new Authority("ROLE_USER"));
+            authorityRepository.save(new Authority("ROLE_OWNER"));
 
-            userService.saveRole(new Authority("READ"));
-            userService.saveRole(new Authority("WRITE"));
-            userService.saveRole(new Authority("UPDATE"));
-            userService.saveRole(new Authority("DELETE"));
-            userService.saveRole(new Authority("ROLE_ADMIN"));
-            userService.saveRole(new Authority("ROLE_USER"));
-            userService.saveRole(new Authority("ROLE_CLIENT"));
+            Authority read = authorityRepository.getAuthorityByAuthority("READ");
+            Authority write = authorityRepository.getAuthorityByAuthority("WRITE");
+            Authority update = authorityRepository.getAuthorityByAuthority("UPDATE");
+            Authority delete = authorityRepository.getAuthorityByAuthority("DELETE");
+            Authority roleAdmin = authorityRepository.getAuthorityByAuthority("ROLE_ADMIN");
+            Authority roleUser = authorityRepository.getAuthorityByAuthority("ROLE_USER");
+            Authority roleOwner = authorityRepository.getAuthorityByAuthority("ROLE_OWNER");
 
+            userRepository.save(new CustomUser("user", passwordEncoder.encode("u")));
+            userRepository.save(new CustomUser("admin", passwordEncoder.encode("a")));
+            userRepository.save(new CustomUser("owner", passwordEncoder.encode("o")));
 
-            userService.saveUser(new CustomUser("a", passwordEncoder.encode("a")));
-            userService.saveUser(new CustomUser("b", passwordEncoder.encode("b")));
-            userService.saveUser(new CustomUser("c", passwordEncoder.encode("c")));
-            userService.saveUser(new CustomUser("super", passwordEncoder.encode("s")));
+            CustomUser user = userRepository.getByUsername("user");
+            CustomUser admin = userRepository.getByUsername("admin");
+            CustomUser owner = userRepository.getByUsername("owner");
 
+            user.addAuthority(read, roleUser);
+            admin.addAuthority(read, write, update, delete, roleAdmin);
+            owner.addAuthority(read, write, update, delete, roleAdmin, roleUser, roleOwner);
 
-            userService.addRoleToUser("a", "ROLE_USER");
-            userService.addRoleToUser("a", "READ");
-            userService.addRoleToUser("b", "ROLE_CLIENT");
-            userService.addRoleToUser("b", "READ");
-            userService.addRoleToUser("b", "WRITE");
-            userService.addRoleToUser("c", "ROLE_ADMIN");
-            userService.addRoleToUser("super", "ROLE_ADMIN");
-            userService.addRoleToUser("super", "ROLE_USER");
-            userService.addRoleToUser("super", "ROLE_CLIENT");
-            userService.addRoleToUser("super", "UPDATE");
-            userService.addRoleToUser("super", "READ");
-            userService.addRoleToUser("super", "WRITE");
-            userService.addRoleToUser("super", "DELETE");
-            
+            userRepository.save(user);
+            userRepository.save(admin);
+            userRepository.save(owner);
         };
     }
 }

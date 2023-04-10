@@ -11,6 +11,8 @@ import lombok.Setter;
 import org.hibernate.annotations.Cascade;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -28,30 +30,25 @@ public class CustomUser implements UserDetails {
     private String username;
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
     @JoinTable(
             name = "user_authority",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "auth_id")
     )
-    private Set<Authority> authorities;
+    private Set<Authority> authorities ;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
     private AvatarImage avatar;
-
-
-//    @OneToOne(mappedBy = "user",cascade = CascadeType.ALL)
-//    @PrimaryKeyJoinColumn
-//    private Token token;
 
     public CustomUser(String username, String password) {
         this.username = username;
         this.password = password;
     }
 
-    public boolean addAuthority(Authority authority) {
-        return authorities.add(authority);
+    public boolean addAuthority(Authority... authority) {
+        return authorities.addAll(Arrays.asList(authority));
     }
 
     @Override
@@ -75,6 +72,6 @@ public class CustomUser implements UserDetails {
     }
 
     public static UserDTO mapToUserDTO(CustomUser user) {
-        return new UserDTO(user.getId(), user.getUsername());
+        return new UserDTO(user.getId(), user.getUsername(), user.getAuthorities());
     }
 }
