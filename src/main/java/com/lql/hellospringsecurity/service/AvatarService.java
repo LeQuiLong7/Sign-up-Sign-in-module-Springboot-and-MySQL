@@ -18,9 +18,9 @@ public class AvatarService {
 
     private final AvatarRepository repository;
 
-    public String uploadFile(MultipartFile file, CustomUser user) throws IOException {
+    public String uploadFile(MultipartFile file, long userId) throws IOException {
 
-        AvatarImage image = new AvatarImage(file.getBytes(), user);
+        AvatarImage image = new AvatarImage(userId, file.getBytes());
         repository.save(image);
 
         return "File saved successfully " + file.getOriginalFilename();

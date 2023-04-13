@@ -1,18 +1,14 @@
 package com.lql.hellospringsecurity.auth;
 
 
-import com.lql.hellospringsecurity.model.AvatarImage;
-import com.lql.hellospringsecurity.model.Token;
 import com.lql.hellospringsecurity.model.UserDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Cascade;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -38,14 +34,12 @@ public class CustomUser implements UserDetails {
     )
     private Set<Authority> authorities ;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn
-    private AvatarImage avatar;
 
     public CustomUser(String username, String password) {
         this.username = username;
         this.password = password;
     }
+
 
     public boolean addAuthority(Authority... authority) {
         return authorities.addAll(Arrays.asList(authority));

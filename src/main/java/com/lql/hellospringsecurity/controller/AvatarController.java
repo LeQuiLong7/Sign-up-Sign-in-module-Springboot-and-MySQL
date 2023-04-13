@@ -25,10 +25,9 @@ public class AvatarController {
     @PostMapping("/upload")
     public String upload(@RequestParam MultipartFile file) throws IOException {
 
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Optional<CustomUser> user = userRepository.findByUsername(username);
+        long userId = ((CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
 
-        return avatarService.uploadFile(file, user.get());
+        return avatarService.uploadFile(file, userId);
     }
 
 

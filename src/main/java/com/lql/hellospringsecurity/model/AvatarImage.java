@@ -23,8 +23,6 @@ public class AvatarImage {
     @Lob
     @Column(columnDefinition = "LONGBLOB")
     private byte[] image;
-
-    @CreatedDate
     private Timestamp createdAt;
 
     @PrePersist
@@ -32,14 +30,8 @@ public class AvatarImage {
         this.createdAt = new Timestamp(System.currentTimeMillis());
     }
 
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "user_id")
-    private CustomUser user;
-
-
-    public AvatarImage(byte[] image, CustomUser user) {
+    public AvatarImage(long id, byte[] image) {
+        this.id = id;
         this.image = image;
-        this.user = user;
     }
 }
