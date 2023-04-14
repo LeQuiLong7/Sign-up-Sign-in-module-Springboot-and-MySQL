@@ -6,8 +6,8 @@ import com.lql.hellospringsecurity.auth.Authority;
 import com.lql.hellospringsecurity.auth.CustomUser;
 import com.lql.hellospringsecurity.exception.model.MyUsernameNotFoundException;
 import com.lql.hellospringsecurity.exception.model.RoleNotFoundException;
-import com.lql.hellospringsecurity.model.request.PageRequestDetail;
 import com.lql.hellospringsecurity.model.UserDTO;
+import com.lql.hellospringsecurity.model.request.PageRequestDetail;
 import com.lql.hellospringsecurity.repository.AuthorityRepository;
 import com.lql.hellospringsecurity.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -18,7 +18,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,7 +30,6 @@ import java.util.Optional;
 public class HomeController {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     private final AuthorityRepository roleRepository;
 
     @GetMapping
@@ -52,14 +50,14 @@ public class HomeController {
     }
 
 
-    @PostMapping
-    @Transactional
-    @PreAuthorize("hasAuthority('WRITE')")
-    public UserDTO add(@RequestBody CustomUser user) {
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return CustomUser.mapToUserDTO(this.userRepository.save(user));
-    }
-
+//    @PostMapping
+//    @Transactional
+//    @PreAuthorize("hasAuthority('WRITE')")
+//    public UserDTO add(@RequestBody CustomUser user) {
+//        user.setPassword(passwordEncoder.encode(user.getPassword()));
+//        return CustomUser.mapToUserDTO(this.userRepository.save(user));
+//    }
+//
 
     @GetMapping("/{username}")
     @PreAuthorize("hasAuthority('READ')")
@@ -95,8 +93,8 @@ public class HomeController {
 
     private Pageable getPageable(PageRequestDetail pageRequestDetail, Sort sort) {
         final int DEFAULT_PAGE_SIZE = 3;
-        return PageRequest.of(pageRequestDetail.getPageNo(),
-                            pageRequestDetail.getPageSize() == 0 ? DEFAULT_PAGE_SIZE : pageRequestDetail.getPageSize(),
+        return PageRequest.of(pageRequestDetail.pageNo(),
+                            pageRequestDetail.pageSize() == 0 ? DEFAULT_PAGE_SIZE : pageRequestDetail.pageSize(),
                             sort);
     }
 

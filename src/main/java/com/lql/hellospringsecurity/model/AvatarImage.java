@@ -1,11 +1,9 @@
 package com.lql.hellospringsecurity.model;
 
 
-import com.lql.hellospringsecurity.auth.CustomUser;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
 
 import java.sql.Timestamp;
 

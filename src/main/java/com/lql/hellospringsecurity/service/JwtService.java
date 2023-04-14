@@ -49,7 +49,6 @@ public class JwtService implements JwtRepository {
 
 
     public String generateToken(Map<String, Object> claims, CustomUser user) {
-
         return  jwtBuilder
                 .addClaims(claims)
                 .setId(String.valueOf(user.getId()))
@@ -58,6 +57,19 @@ public class JwtService implements JwtRepository {
                 .setExpiration(new Date(System.currentTimeMillis() + (10 * 60
                         * 1000)))
                 .compact();
+    }
+
+    public String generateConfirmToken(String username) {
+        return  jwtBuilder
+                .setSubject(username)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + (15 * 60
+                        * 1000)))
+                .compact();
+    }
+
+    public boolean isConfirmationTokenValid(String token) {
+        return isTokenNotExpired(token);
     }
 
     public String generateToken(CustomUser user) {

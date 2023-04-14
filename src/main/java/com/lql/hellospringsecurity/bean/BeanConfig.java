@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -23,6 +25,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.crypto.SecretKey;
+import java.util.Properties;
 
 @Configuration
 @RequiredArgsConstructor
@@ -70,8 +73,27 @@ public class BeanConfig {
         return configuration.getAuthenticationManager();
     }
 
-//    @Bean
-//    @Transactional
+
+    @Bean
+    public JavaMailSender getJavaMailSender() {
+        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+        mailSender.setHost("smtp.gmail.com");
+        mailSender.setPort(587);
+
+        mailSender.setUsername("namkhuc6@gmail.com");
+        mailSender.setPassword("mjuimccgnzywjfxq");
+
+        Properties props = mailSender.getJavaMailProperties();
+        props.put("mail.transport.protocol", "smtp");
+        props.put("mail.smtp.auth", "true");
+        props.put("mail.smtp.starttls.enable", "true");
+        props.put("mail.debug", "true");
+
+        return mailSender;
+    }
+
+    @Bean
+    @Transactional
     public CommandLineRunner runner(PasswordEncoder passwordEncoder) {
         return args -> {
             authorityRepository.save(new Authority("READ"));
@@ -90,9 +112,9 @@ public class BeanConfig {
             Authority roleUser = authorityRepository.getAuthorityByAuthority("ROLE_USER");
             Authority roleOwner = authorityRepository.getAuthorityByAuthority("ROLE_OWNER");
 
-            userRepository.save(new CustomUser("user", passwordEncoder.encode("u")));
-            userRepository.save(new CustomUser("admin", passwordEncoder.encode("a")));
-            userRepository.save(new CustomUser("owner", passwordEncoder.encode("o")));
+            userRepository.save(new CustomUser("user", passwordEncoder.encode("u"), true));
+            userRepository.save(new CustomUser("admin", passwordEncoder.encode("a"), true));
+            userRepository.save(new CustomUser("owner", passwordEncoder.encode("o"), true));
 
             CustomUser user = userRepository.getByUsername("user");
             CustomUser admin = userRepository.getByUsername("admin");

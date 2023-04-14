@@ -36,6 +36,7 @@ public class SecurityConfig {
                         .requestMatchers("/sign-in").permitAll()
                         .requestMatchers("/sign-up").permitAll()
                         .requestMatchers("/home").permitAll()
+                        .requestMatchers("/registry/**").permitAll()
                         .anyRequest().authenticated()
 //                    .and().sessionManagement()
 //                        .sessionCreationPolicy(STATELESS)

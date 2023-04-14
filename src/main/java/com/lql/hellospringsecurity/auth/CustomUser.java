@@ -34,10 +34,19 @@ public class CustomUser implements UserDetails {
     )
     private Set<Authority> authorities ;
 
+    @Column(columnDefinition = "BIT default 0")
+    private boolean isActive;
 
+
+    public CustomUser(String username, String password, boolean isActive) {
+        this.username = username;
+        this.password = password;
+        this.isActive = isActive;
+    }
     public CustomUser(String username, String password) {
         this.username = username;
         this.password = password;
+        this.isActive = false;
     }
 
 
@@ -62,7 +71,7 @@ public class CustomUser implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return isActive;
     }
 
     public static UserDTO mapToUserDTO(CustomUser user) {
