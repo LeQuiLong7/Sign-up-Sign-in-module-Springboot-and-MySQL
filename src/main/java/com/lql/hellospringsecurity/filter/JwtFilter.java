@@ -1,8 +1,8 @@
 package com.lql.hellospringsecurity.filter;
 
-import com.lql.hellospringsecurity.repository.UserRepository;
 import com.lql.hellospringsecurity.service.JwtService;
 import com.lql.hellospringsecurity.service.UserService;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
@@ -38,11 +37,17 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         final String token = header.substring(7);
-
-        if(!jwtService.isTokenValid(token)) {
-            filterChain.doFilter(request, response);
+        try {
+            if(!jwtService.isTokenValid(token)) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+        } catch (JwtException e) {
+            response.setStatus(401);
+            response.getWriter().write(e.getMessage());
             return;
         }
+
         UserDetails user = userService.loadUserByUsername(jwtService.extractUserName(token));
 
         UsernamePasswordAuthenticationToken authenticationToken =

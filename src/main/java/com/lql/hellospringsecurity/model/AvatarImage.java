@@ -21,6 +21,7 @@ public class AvatarImage {
     @Lob
     @Column(columnDefinition = "LONGBLOB")
     private byte[] image;
+
     private Timestamp createdAt;
 
     @PrePersist

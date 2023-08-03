@@ -1,6 +1,7 @@
 package com.lql.hellospringsecurity.controller;
 
 import com.lql.hellospringsecurity.auth.CustomUser;
+import com.lql.hellospringsecurity.model.JwtToken;
 import com.lql.hellospringsecurity.model.Token;
 import com.lql.hellospringsecurity.repository.TokenRepository;
 import com.lql.hellospringsecurity.repository.UserRepository;
@@ -24,11 +25,14 @@ public class LoginController {
 
     @GetMapping("/getToken")
     @ResponseBody
-    public String getToken() {
+    public JwtToken getToken() {
 
         CustomUser user = getAuthenticatedUser();
 
+
         String jwtToken = jwtService.generateToken(user);
+
+
         Optional<Token> optionalToken = tokenRepository.findById(user.getId());
         if (optionalToken.isEmpty() ) {
             Token token = new Token(user.getId(), true);
@@ -40,7 +44,8 @@ public class LoginController {
                 tokenRepository.save(tokenObject);
             }
         }
-        return jwtToken;
+
+        return new JwtToken(jwtToken);
 
     }
 
@@ -56,6 +61,11 @@ public class LoginController {
 
         return "jwt-logged-out";
     }
+
+
+
+
+
 
     private CustomUser getAuthenticatedUser() {
         return (CustomUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

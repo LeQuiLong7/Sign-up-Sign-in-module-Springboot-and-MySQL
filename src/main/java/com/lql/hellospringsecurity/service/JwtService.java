@@ -9,6 +9,7 @@ import com.lql.hellospringsecurity.repository.TokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.impl.crypto.DefaultJwtSignatureValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +21,6 @@ import java.util.function.Function;
 @Service
 @RequiredArgsConstructor
 public class JwtService implements JwtRepository {
-
     private final TokenRepository tokenRepository;
     private final JwtBuilder jwtBuilder;
     private final JwtParser jwtParser;
@@ -76,10 +76,10 @@ public class JwtService implements JwtRepository {
         return generateToken(new HashMap<>(), user);
     }
 
-    public boolean isTokenValid(String token) {
+    public boolean isTokenValid(String token){
+        if (!isTokenNotExpired(token)) return false;
         Token tokenObject = tokenRepository.findById(extractUserId(token)).orElseThrow(MyUsernameNotFoundException::new);
-        return isTokenNotExpired(token) && tokenObject.isValid();
-
+        return tokenObject.isValid();
 
     }
     private boolean isTokenNotExpired(String token) {

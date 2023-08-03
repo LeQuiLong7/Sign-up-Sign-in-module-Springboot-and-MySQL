@@ -8,6 +8,7 @@ import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.impl.crypto.DefaultJwtSignatureValidator;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import jakarta.transaction.Transactional;
@@ -36,24 +37,21 @@ public class BeanConfig {
     private final AuthorityRepository authorityRepository;
     private final UserRepository userRepository;
 
+    private static SecretKey getSecretKey() {
+        final String SECRET_KEY = "7336763979244226452948404D6351665468576D5A7134743777217A25432A46";
+        byte[] bytes = Decoders.BASE64.decode(SECRET_KEY);
+        return Keys.hmacShaKeyFor(bytes);
+    }
 
 
     @Bean
     public JwtBuilder jwtBuilder() {
-        final String SECRET_KEY = "7336763979244226452948404D6351665468576D5A7134743777217A25432A46";
-        byte[] bytes = Decoders.BASE64.decode(SECRET_KEY);
-        SecretKey secretKey = Keys.hmacShaKeyFor(bytes);
-
-        return Jwts.builder().signWith(secretKey, SignatureAlgorithm.HS256);
+        return Jwts.builder().signWith(getSecretKey(), SignatureAlgorithm.HS256);
 
     }
     @Bean
     public JwtParser jwtParser() {
-        final String SECRET_KEY = "7336763979244226452948404D6351665468576D5A7134743777217A25432A46";
-        byte[] bytes = Decoders.BASE64.decode(SECRET_KEY);
-        SecretKey secretKey = Keys.hmacShaKeyFor(bytes);
-
-        return Jwts.parserBuilder().setSigningKey(secretKey).build();
+        return Jwts.parserBuilder().setSigningKey(getSecretKey()).build();
 
     }
 
@@ -81,7 +79,7 @@ public class BeanConfig {
         mailSender.setPort(587);
 
         mailSender.setUsername("namkhuc6@gmail.com");
-        mailSender.setPassword("mjuimccgnzywjfxq");
+        mailSender.setPassword("ijieaobnnrwmqbuj");
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
@@ -92,17 +90,17 @@ public class BeanConfig {
         return mailSender;
     }
 
-    @Bean
-    @Transactional
+//    @Bean
+//    @Transactional
     public CommandLineRunner runner(PasswordEncoder passwordEncoder) {
         return args -> {
-            authorityRepository.save(new Authority("READ"));
-            authorityRepository.save(new Authority("WRITE"));
-            authorityRepository.save(new Authority("UPDATE"));
-            authorityRepository.save(new Authority("DELETE"));
-            authorityRepository.save(new Authority("ROLE_ADMIN"));
-            authorityRepository.save(new Authority("ROLE_USER"));
-            authorityRepository.save(new Authority("ROLE_OWNER"));
+//            Authority read = authorityRepository.saveAndFlush(new Authority("READ"));
+//            Authority write = authorityRepository.saveAndFlush(new Authority("WRITE"));
+//            Authority update = authorityRepository.saveAndFlush(new Authority("UPDATE"));
+//            Authority delete = authorityRepository.saveAndFlush(new Authority("DELETE"));
+//            Authority roleAdmin = authorityRepository.saveAndFlush(new Authority("ROLE_ADMIN"));
+//            Authority roleUser = authorityRepository.saveAndFlush(new Authority("ROLE_USER"));
+//            Authority roleOwner = authorityRepository.saveAndFlush(new Authority("ROLE_OWNER"));
 
             Authority read = authorityRepository.getAuthorityByAuthority("READ");
             Authority write = authorityRepository.getAuthorityByAuthority("WRITE");
@@ -111,10 +109,15 @@ public class BeanConfig {
             Authority roleAdmin = authorityRepository.getAuthorityByAuthority("ROLE_ADMIN");
             Authority roleUser = authorityRepository.getAuthorityByAuthority("ROLE_USER");
             Authority roleOwner = authorityRepository.getAuthorityByAuthority("ROLE_OWNER");
+//            CustomUser user = new CustomUser("user", passwordEncoder.encode("u"), true);
+////            CustomUser user = userRepository.saveAndFlush(new CustomUser("user", passwordEncoder.encode("u"), true));
+////            CustomUser user1 = userRepository.saveAndFlush(user);
+//            userRepository.save(user);
+//            CustomUser user1 = userRepository.getByUsername("user");
 
-            userRepository.save(new CustomUser("user", passwordEncoder.encode("u"), true));
-            userRepository.save(new CustomUser("admin", passwordEncoder.encode("a"), true));
-            userRepository.save(new CustomUser("owner", passwordEncoder.encode("o"), true));
+//            CustomUser user = userRepository.saveAndFlush(new CustomUser("user", passwordEncoder.encode("u"), true));
+//            userRepository.saveAndFlush(new CustomUser("admin", passwordEncoder.encode("a"), true));
+//            userRepository.saveAndFlush(new CustomUser("owner", passwordEncoder.encode("o"), true));
 
             CustomUser user = userRepository.getByUsername("user");
             CustomUser admin = userRepository.getByUsername("admin");
@@ -127,6 +130,9 @@ public class BeanConfig {
             userRepository.save(user);
             userRepository.save(admin);
             userRepository.save(owner);
+
+
         };
+
     }
 }

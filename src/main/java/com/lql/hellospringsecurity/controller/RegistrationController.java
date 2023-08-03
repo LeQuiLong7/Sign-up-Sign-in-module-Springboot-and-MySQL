@@ -7,6 +7,7 @@ import com.lql.hellospringsecurity.model.UserDTO;
 import com.lql.hellospringsecurity.model.request.RegistryRequest;
 import com.lql.hellospringsecurity.service.MailService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,11 +18,11 @@ public class RegistrationController {
     private final MailService mailService;
 
     @PostMapping
-    public String registry(@RequestBody RegistryRequest registryRequest) {
+    public ResponseEntity<UserDTO> registry(@RequestBody RegistryRequest registryRequest) {
 
-        mailService.registryNewUser(registryRequest);
+        CustomUser user = mailService.registryNewUser(registryRequest);
 
-        return "Registry Successfully!";
+        return ResponseEntity.status(201).body(CustomUser.mapToUserDTO(user));
     }
 
     @GetMapping("/confirmEmail/token={token}")

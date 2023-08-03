@@ -32,7 +32,8 @@ public class CustomUser implements UserDetails {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "auth_id")
     )
-    private Set<Authority> authorities ;
+    private Set<Authority> authorities;
+
 
     @Column(columnDefinition = "BIT default 0")
     private boolean isActive;

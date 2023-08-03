@@ -19,7 +19,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AvatarController {
 
-    private final UserRepository userRepository;
     private final AvatarService avatarService;
 
     @PostMapping("/upload")
@@ -29,6 +28,7 @@ public class AvatarController {
 
         return avatarService.uploadFile(file, userId);
     }
+
 
 
     @GetMapping("/get-avt")

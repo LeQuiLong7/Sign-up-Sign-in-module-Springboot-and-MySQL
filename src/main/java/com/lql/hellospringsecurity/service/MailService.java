@@ -27,18 +27,19 @@ public class MailService {
 
     private final JwtService jwtService;
 
-    public void registryNewUser(RegistryRequest registryRequest) {
+    public CustomUser registryNewUser(RegistryRequest registryRequest) {
         String email = registryRequest.email();
         String username = registryRequest.username();
+
         if (!isEmailValid(email) ) throw new EmailNotValidException(email);
         if(userRepository.existsByUsername(username)) throw new UserAlreadyExistException();
 
         String token = jwtService.generateConfirmToken(username);
 
         CustomUser user = new CustomUser(registryRequest.username(), passwordEncoder.encode(registryRequest.password()));
-        userRepository.save(user);
 
         sendConfirmEmail(email, registryRequest.name(), token);
+        return userRepository.save(user);
     }
 
     @Transactional

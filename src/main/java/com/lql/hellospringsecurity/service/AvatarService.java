@@ -2,6 +2,7 @@ package com.lql.hellospringsecurity.service;
 
 
 import com.lql.hellospringsecurity.auth.CustomUser;
+import com.lql.hellospringsecurity.exception.model.AvatarNotFoundException;
 import com.lql.hellospringsecurity.exception.model.MyUsernameNotFoundException;
 import com.lql.hellospringsecurity.model.AvatarImage;
 import com.lql.hellospringsecurity.repository.AvatarRepository;
@@ -31,7 +32,7 @@ public class AvatarService {
         if(avatarImage.isPresent())
             return avatarImage.get().getImage();
 
-        throw new MyUsernameNotFoundException();
+        throw new AvatarNotFoundException();
     }
 
 

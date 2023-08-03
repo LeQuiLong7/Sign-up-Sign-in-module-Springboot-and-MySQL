@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-@MyAnnotation("Hello World")
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
@@ -34,21 +33,14 @@ public class HomeController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('READ')")
-    public List<UserDTO> get(@RequestBody PageRequestDetail pageRequestDetail) {
-        Pageable pageable = getPageable(pageRequestDetail, Sort.unsorted());
+    public List<UserDTO> getAll(@RequestParam(required = false, defaultValue = "0") int pageNo,
+                             @RequestParam(required = false, defaultValue = "3") int pageSize,
+                             @RequestParam(required = false, defaultValue = "id") String sortBy) {
+
+        Pageable pageable  = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
         Page<CustomUser> users = userRepository.findAll(pageable);
-
         return users.getContent().stream().map(CustomUser::mapToUserDTO).toList();
-
     }
-
-    @GetMapping("/sort-by/{property}")
-    @PreAuthorize("hasAuthority('READ')")
-    public List<UserDTO> getAllUserSortedBy(@PathVariable String property, @RequestBody PageRequestDetail pageRequestDetail){
-        Pageable pageable = getPageable(pageRequestDetail, Sort.by(property));
-        return userRepository.findAll(pageable).getContent().stream().map(CustomUser::mapToUserDTO).toList();
-    }
-
 
 //    @PostMapping
 //    @Transactional
@@ -61,7 +53,7 @@ public class HomeController {
 
     @GetMapping("/{username}")
     @PreAuthorize("hasAuthority('READ')")
-    public ResponseEntity<?> getCustomUserById(@PathVariable("username") String username) {
+    public ResponseEntity<?> getUserByUsername(@PathVariable("username") String username) {
         Optional<CustomUser> user = this.userRepository.findByUsername(username);
 
         if (user.isPresent())
@@ -73,11 +65,14 @@ public class HomeController {
     @DeleteMapping("/{username}")
     @PreAuthorize("hasRole('ADMIN')")
     @Transactional
-    public List<UserDTO> deleteById(@PathVariable String username, @RequestBody PageRequestDetail pageRequestDetail) {
-        Optional<CustomUser> user = this.userRepository.findByUsername(username);
-        user.ifPresent(this.userRepository::delete);
-        Pageable pageable = getPageable(pageRequestDetail, Sort.unsorted());
+    public List<UserDTO> deleteByUsername(@PathVariable String username,
+                                    @RequestParam(required = false, defaultValue = "0") int pageNo,
+                                    @RequestParam(required = false, defaultValue = "3") int pageSize,
+                                    @RequestParam(required = false, defaultValue = "id") String sortBy) {
 
+        Optional<CustomUser> user = userRepository.findByUsername(username);
+        user.ifPresent(userRepository::delete);
+        Pageable pageable  = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
         return this.userRepository.findAll(pageable).getContent().stream().map(CustomUser::mapToUserDTO).toList();
     }
 
@@ -86,16 +81,9 @@ public class HomeController {
     @Transactional
     public UserDTO addRoleToUser(String username, String roleName){
         CustomUser user = userRepository.findByUsername(username).orElseThrow(MyUsernameNotFoundException::new);
-        Authority role = roleRepository.findAuthorityByAuthority(roleName).orElseThrow(RoleNotFoundException::new);
+        Authority role = roleRepository.findAuthorityByAuthority(roleName.toUpperCase()).orElseThrow(RoleNotFoundException::new);
         user.addAuthority(role);
         return CustomUser.mapToUserDTO(user);
-    }
-
-    private Pageable getPageable(PageRequestDetail pageRequestDetail, Sort sort) {
-        final int DEFAULT_PAGE_SIZE = 3;
-        return PageRequest.of(pageRequestDetail.pageNo(),
-                            pageRequestDetail.pageSize() == 0 ? DEFAULT_PAGE_SIZE : pageRequestDetail.pageSize(),
-                            sort);
     }
 
 
